@@ -14,8 +14,9 @@ from sklearn.feature_extraction.text import CountVectorizer
 import matplotlib.pyplot as plt
 import matplotlib
 # matplotlib.use('Agg')
+import os
 import seaborn as sns
-from PIL import Image
+import PIL.Image
 # classification of multiple labels
 # assuming no correlation between labels of toxicity in comment
 # implemented using csv file data from
@@ -49,8 +50,8 @@ class YouToxLogistic:
         def predictTox(val):
             return YouToxLogistic.youtoxlog.predict_proba(val)[:,1]
         def pngToGIF(path):
-            img = Image.open(path)
-            img.save('pic.gif')
+            img = PIL.Image.open(path)
+            img.save('toxicity.gif')
         self.cleanData()
         # data vectorization
         limit = 5000
@@ -76,9 +77,9 @@ class YouToxLogistic:
         plt.title("Toxicity of Corpus")
         plt.xlabel("Toxicity Scale")
         plt.ylabel("% Probability of Label")
-        plt.savefig('pic.png')
+        plt.savefig('toxicity.png')
         # turns png image into gif
-        pngToGIF("pic.png")
+        pngToGIF("toxicity.png")
 
 def run(val):
     yt = YouToxLogistic(data="./train.csv", val = val)

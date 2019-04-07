@@ -95,6 +95,7 @@ class YouToxSentiment:
                    interpolation='bilinear')
         plt.xlabel("Youtube Video Negative")
         plt.savefig("pic.png")
+        plt.clf()
         pngToGIF("pic.png")
 
 def analyzeSentiment(words):

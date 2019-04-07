@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 # import dependencies
-import youToxLogistic
+import os
 import matplotlib.pyplot as plt,time,random,requests,pandas as pd,numpy as np
 import nltk, seaborn as sns
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
@@ -67,7 +67,7 @@ class GoogleNewsScraper:
     def drawPlots(self,text,mask,color = 'white'):
         def pngToGIF(path):
             img = Image.open(path)
-            img.save('pic.gif')
+            img.save('gNews.gif')
         words = " ".join([word for word in text.split()])
         self.getTopPolarityWords()
         positives = self.polarities["Positive"]
@@ -119,8 +119,10 @@ class GoogleNewsScraper:
         plt.imshow(wordcloud3.recolor(color_func=cloudColors),
                    interpolation='bilinear')
         plt.xlabel("Google News Negative")
-        plt.savefig("pic.png")
-        pngToGIF("pic.png")
+        plt.savefig("gNews.png")
+        plt.clf()
+        pngToGIF("gNews.png")
+
     def pageDiagnostics(self):
         text = " ".join(self.headlines)
         mask = np.array(Image.open("GoogleG.png"))

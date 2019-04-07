@@ -71,7 +71,13 @@ class NavigationBar(Bar):
                 return NavigationBar.items[i]
 
 def init(d):
-    d.mode = "HomePage"; d.modes = ["HomePage","AboutPage","YoutubePage","DataPage"]
+    try:os.remove("pic.gif");os.remove("pic.png")
+    except:pass
+    try:os.remove("toxicity.gif");os.remove("toxicity.png")
+    except:pass
+    try:os.remove("gNews.gif");os.remove("gNews.png")
+    except:pass
+    d.mode = "HomePage"; d.modes = ["HomePage","AboutPage","YoutubePage","ToxPage","YTPage","GooglePage"]
     d.query = ""; d.maxLength = 50
     d.typingHome = False
     d.typingYoutube = False
@@ -84,6 +90,7 @@ def init(d):
     d.showCursorYoutube = False
     d.showCursorHome = False
     d.second = 0
+    d.curr = "StartPage"
 
 def drawStartPage(c,d):
     n = NavigationBar(0,0,d.width,50)
@@ -136,11 +143,28 @@ def drawNewsButton(c,d):
                   font="Merriweather "+str(int(d.height*0.035)))
     d.newsButton = button
 
-def drawDataPage(c,d):
+def drawytPage(c,d):
+    c.delete("all")
     n = NavigationBar(0,0,d.width,50)
     n.draw(c,"lightblue")
-    margin = 10
     pic = PhotoImage(file="pic.gif")
+    img = Label(image=pic)
+    img.image = pic
+    c.create_image(d.width/2,d.height*0.45,image=pic)
+
+def drawToxPage(c,d):
+    c.delete("all")
+    n = NavigationBar(0,0,d.width,50)
+    n.draw(c,"lightblue")
+    pic = PhotoImage(file="toxicity.gif")
+    img = Label(image=pic)
+    img.image = pic
+    c.create_image(d.width/2,d.height*0.45,image=pic)
+def drawGooglePage(c,d):
+    c.delete("all")
+    n = NavigationBar(0,0,d.width,50)
+    n.draw(c,"lightblue")
+    pic = PhotoImage(file="gNews.gif")
     img = Label(image=pic)
     img.image = pic
     c.create_image(d.width/2,d.height*0.45,image=pic)
@@ -161,15 +185,16 @@ def editQuery(e,d,i,typing):
         if e.keysym == "BackSpace":
             d.query = d.query[:-1]
         elif e.keysym == "Return":
-            d.mode = "DataPage"
             if i == 1:
                 if "www.youtube" in d.query:
+                    d.mode = "YTPage"
                     comments = youtubeComments.runCommentScrape(d.query)
                     yt = youtoxsentiment.YouToxSentiment(d.query)
                     yt.plotsYT(comments,np.array(PIL.Image.open("ytLogo.png")))
                 else:
                     d.mode = "HomePage"
             else:
+                d.mode = "ToxPage"
                 youToxLogistic.run(d.query)
         else:
             d.query += e.char
@@ -198,19 +223,19 @@ def mousePressed(e,d):
     if d.mode == "HomePage":
         if d.startSearch.inSearchBar(e.x,e.y):
             d.typingHome = True
-        if d.startSearch.inSearchButton(e.x,e.y):
-            d.mode = "DataPage"
+        elif d.startSearch.inSearchButton(e.x,e.y):
+            d.mode = "ToxPage"
             youToxLogistic.run(d.query)
-        if d.newsButton.inBar(e.x,e.y):
-            d.mode = "DataPage"
+        elif d.newsButton.inBar(e.x,e.y):
+            d.mode = "GooglePage"
             googleNewsScraper.scrapeGoogleNews()
         changePage(e,d)
     elif d.mode == "YoutubePage":
         if d.youtubeSearch.inSearchBar(e.x,e.y):
             d.typingYoutube = True
         if d.youtubeSearch.inSearchButton(e.x,e.y):
-            d.mode = "DataPage"
             if "www.youtube" in d.query:
+                d.mode = "YTPage"
                 comments = youtubeComments.runCommentScrape(d.query)
                 yt = youtoxsentiment.YouToxSentiment(d.query)
                 yt.plotsYT(comments,np.array(PIL.Image.open("ytLogo.png")))
@@ -219,7 +244,11 @@ def mousePressed(e,d):
         changePage(e,d)
     elif d.mode == "AboutPage":
         changePage(e,d)
-    elif d.mode == "DataPage":
+    elif d.mode == "ToxPage":
+        changePage(e,d)
+    elif d.mode == "YTPage":
+        changePage(e,d)
+    elif d.mode == "GooglePage":
         changePage(e,d)
 
 def redrawAll(c,d):
@@ -229,8 +258,12 @@ def redrawAll(c,d):
         drawAboutPage(c,d)
     elif d.mode == "YoutubePage":
         drawYoutubePage(c,d)
-    elif d.mode == "DataPage":
-        drawDataPage(c,d)
+    elif d.mode == "ToxPage":
+        drawToxPage(c,d)
+    elif d.mode == "YTPage":
+        drawytPage(c,d)
+    elif d.mode == "GooglePage":
+        drawGooglePage(c,d)
     image = PhotoImage(file="logo.gif")
     image = image.subsample(11,11)
     img = Label(image=image)
