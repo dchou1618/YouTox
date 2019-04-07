@@ -5,7 +5,7 @@ Sentiment Analysis/Webscraper
 Designed basic tkinter application to scrape google news (edited application of prior work), youtube comments with selenium, and recognized user inputted comments to demonstrate the filtering of basic logistic regression prediction models. 
 
 ## Results 
-Tkinter Application 
+Three Pages (Home, About, YouTube) bring the viewer to three distinct parts of the tkinter application. User can input corpus for trained model to predict its toxicity and observe "today's news" as well as sentiment and toxicity of youtube comments. 
 
 ## Future Work
 
