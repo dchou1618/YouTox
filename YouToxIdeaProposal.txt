@@ -1,0 +1,3 @@
+Backtracking - generation of words into groups such that they are related in sentiment in some way. 
+
+	(1) Determination of sentiment similarity - based on toxicity regression model. 

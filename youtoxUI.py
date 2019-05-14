@@ -3,8 +3,11 @@
 import tkinter as tk
 import numpy as np
 import PIL.Image
+import PIL.ImageTk
 import copy
 import os
+import threading
+import cv2
 from tkinter import *
 
 class Bar:
@@ -12,7 +15,8 @@ class Bar:
         self.x0 = x0; self.y0 = y0
         self.x1 = x1; self.y1 = y1
     def draw(self,canvas,fill):
-        canvas.create_rectangle(self.x0,self.y0,self.x1,self.y1,fill=fill)
+        canvas.create_rectangle(self.x0,self.y0,self.x1,self.y1,fill=fill,\
+                                width=10)
     def inBar(self,x,y):
         return self.x0<=x<=self.x1 and self.y0<=y<=self.y1
 
@@ -77,7 +81,8 @@ def init(d):
     except:pass
     try:os.remove("gNews.gif");os.remove("gNews.png")
     except:pass
-    d.mode = "HomePage"; d.modes = ["HomePage","AboutPage","YoutubePage","ToxPage","YTPage","GooglePage"]
+    d.mode = "HomePage"; d.modes = ["HomePage","AboutPage","YoutubePage",\
+                                    "ToxPage","YTPage","GooglePage","LoadingPage"]
     d.query = ""; d.maxLength = 50
     d.typingHome = False
     d.typingYoutube = False
@@ -91,11 +96,15 @@ def init(d):
     d.showCursorHome = False
     d.second = 0
     d.curr = "StartPage"
+    d.navigation = NavigationBar(0,0,d.width,50)
+    d.loadedAmount = 0
+    d.loading = False
+    d.nextMode = ""
+    if "YouToxLogistictoxic.sav" in os.listdir("."): d.trainModel = False
+    else: d.trainModel = True
 
 def drawStartPage(c,d):
-    n = NavigationBar(0,0,d.width,50)
-    d.navigationBar = n
-    n.draw(c,"lightblue")
+    d.navigation.draw(c,"lightblue")
     margin = 10
     s = SearchBar(margin,d.height*0.5,d.width-margin,d.height*0.6)
     d.startSearch = s
@@ -113,17 +122,13 @@ def drawAboutPage(c,d):
     img = Label(image=pic)
     img.image = pic
     c.create_image(d.width/2,d.height*0.60,image=pic)
-
-    n = NavigationBar(0,0,d.width,50)
-    d.navigationBar = n
-    n.draw(c,"lightblue")
+    d.navigation.draw(c,"lightblue")
     margin = 10
     c.create_text(d.width*0.45,d.height//7,text=d.about,
                   font="Merriweather "+str(int(d.height*0.035)) + " bold")
 
 def drawYoutubePage(c,d):
-    n = NavigationBar(0,0,d.width,50)
-    n.draw(c,"lightblue")
+    d.navigation.draw(c,"lightblue")
     margin = 10
     s = SearchBar(margin,d.height*0.5,d.width-margin,d.height*0.6)
     d.youtubeSearch = s
@@ -145,8 +150,7 @@ def drawNewsButton(c,d):
 
 def drawytPage(c,d):
     c.delete("all")
-    n = NavigationBar(0,0,d.width,50)
-    n.draw(c,"lightblue")
+    d.navigation.draw(c,"lightblue")
     pic = PhotoImage(file="pic.gif")
     img = Label(image=pic)
     img.image = pic
@@ -154,20 +158,46 @@ def drawytPage(c,d):
 
 def drawToxPage(c,d):
     c.delete("all")
-    n = NavigationBar(0,0,d.width,50)
-    n.draw(c,"lightblue")
+    d.navigation.draw(c,"lightblue")
     pic = PhotoImage(file="toxicity.gif")
     img = Label(image=pic)
     img.image = pic
     c.create_image(d.width/2,d.height*0.45,image=pic)
+
 def drawGooglePage(c,d):
     c.delete("all")
-    n = NavigationBar(0,0,d.width,50)
-    n.draw(c,"lightblue")
+    d.navigation.draw(c,"lightblue")
     pic = PhotoImage(file="gNews.gif")
     img = Label(image=pic)
     img.image = pic
     c.create_image(d.width/2,d.height*0.45,image=pic)
+
+def drawLoadingPage(c,d):
+    c.delete("all")
+    d.navigation.draw(c,"lightblue")
+    c.create_text(d.width/2,d.height*0.40,text="Loading",font="Merriweather " + \
+                  str(int(d.width*0.05))+" bold")
+    c.create_rectangle(0.05*d.width,0.5*d.height,d.width*0.05+(d.loadedAmount),\
+                       0.6*d.height,fill="gold")
+    c.create_rectangle(0.05*d.width,0.5*d.height,d.width*0.95,0.6*d.height,\
+                       fill=None,width=10)
+    # cap = cv2.VideoCapture('winnie.MOV')
+    # while cap.isOpened():
+    #     ret, frame = cap.read()
+    #     newFrame = cv2.flip(frame,1)
+    #     cv2.imshow('frame',newFrame)
+    #     if cv2.waitKey(1) & 0xFF == ord('q'):
+    #         break
+    # cap.release()
+    # cv2.destroyAllWindows()
+
+def timerLoadingPage(d):
+    if d.loading:
+        d.loadedAmount += d.width*0.0025
+        if d.loadedAmount >= 0.90*d.width:
+            d.loading = False
+            d.mode = d.nextMode
+            d.loadedAmount = 0
 
 def timerFired(d):
     d.second += 1
@@ -178,6 +208,8 @@ def timerFired(d):
         elif d.mode == "YoutubePage":
             if d.typingYoutube:
                 d.showCursorYoutube = not d.showCursorYoutube
+    if d.mode == "LoadingPage":
+        timerLoadingPage(d)
 
 def editQuery(e,d,i,typing):
     import youToxLogistic, youtubeComments, youtoxsentiment
@@ -210,7 +242,7 @@ def keyPressed(e,d):
 
 def changePage(e,d):
     for i in range(len(d.modes)):
-        item = d.navigationBar.inWhichItem(e.x,e.y)
+        item = d.navigation.inWhichItem(e.x,e.y)
         if item != None and item in d.modes[i]:
             d.mode = d.modes[i]; d.q = d.query
             d.query = ""
@@ -224,21 +256,31 @@ def mousePressed(e,d):
         if d.startSearch.inSearchBar(e.x,e.y):
             d.typingHome = True
         elif d.startSearch.inSearchButton(e.x,e.y):
-            d.mode = "ToxPage"
-            youToxLogistic.run(d.query)
+            d.nextMode = "ToxPage"
+            logisticModel = threading.Thread(target = youToxLogistic.run,\
+                                             args = (d.query,d.trainModel))
+            logisticModel.start()
+            d.mode = "LoadingPage"
+            d.trainModel = False
+            d.loading = True
         elif d.newsButton.inBar(e.x,e.y):
-            d.mode = "GooglePage"
-            googleNewsScraper.scrapeGoogleNews()
+            d.nextMode = "GooglePage"
+            googleNews = threading.Thread(target = googleNewsScraper.scrapeGoogleNews)
+            googleNews.start()
+            d.mode = "LoadingPage"
+            d.loading = True
         changePage(e,d)
     elif d.mode == "YoutubePage":
         if d.youtubeSearch.inSearchBar(e.x,e.y):
             d.typingYoutube = True
         if d.youtubeSearch.inSearchButton(e.x,e.y):
             if "www.youtube" in d.query:
-                d.mode = "YTPage"
+                d.nextMode = "YTPage"
                 comments = youtubeComments.runCommentScrape(d.query)
                 yt = youtoxsentiment.YouToxSentiment(d.query)
                 yt.plotsYT(comments,np.array(PIL.Image.open("ytLogo.png")))
+                d.mode = "LoadingPage"
+                d.loading = True
             else:
                 d.mode = "HomePage"
         changePage(e,d)
@@ -264,6 +306,8 @@ def redrawAll(c,d):
         drawytPage(c,d)
     elif d.mode == "GooglePage":
         drawGooglePage(c,d)
+    elif d.mode == "LoadingPage":
+        drawLoadingPage(c,d)
     image = PhotoImage(file="logo.gif")
     image = image.subsample(11,11)
     img = Label(image=image)

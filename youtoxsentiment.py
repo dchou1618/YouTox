@@ -97,6 +97,27 @@ class YouToxSentiment:
         plt.savefig("pic.png")
         plt.clf()
         pngToGIF("pic.png")
+    def completedGroups(self,currGroups):
+        return None not in currGroups
+    def validGroups(self,currGroups,i,sentence,L):
+        pass
+    def groupWrapper(self,currGroups,allItemGroups,L):
+        if self.completedGroups(currGroups):
+            return currGroups
+        for i in range(len(currGroups)):
+            for sentence in L:
+                if validGroups(currGroups,i,sentence,L):
+                    currGroups[i].append(sentence)
+                    tempGroups = groupWrapper(self,currGroups,allItemGroups,L)
+                    if tempGroups != None:
+                        return tempGroups
+                    currGroups[i].pop()
+
+    # generates different groups of related-toxicity labels
+    def generateGroups(self,L):
+        currGroups = [None]*6 # number of toxicity labels
+        allItemGroups = []
+        return self.groupWrapper(currGroups,allItemGroups,L)
 
 def analyzeSentiment(words):
     yt = YouToxSentiment(words)

@@ -1,0 +1,22 @@
+(1) How to import python files/modules without NSApplication setup error 
+https://www.youtube.com/watch?v=zIwkhEqVq4s
+
+https://www.youtube.com/watch?v=QYh6mYIJG2Y
+
+
+Regressions and web-scraping to analyze sentiment and toxicity online
+
+
+We created a Tkinter application that can allow users to analyze sentiment based on their input or from online webpages. We used selenium to web-scrape youtube comments and beautiful soup to scrape google news for daily news, which displays in a tkinter GUI. We implemented sentimental analyses based on training data of wikipedia comments, which is demonstrated in the diagrams. 
+
+
+os, matplotlib, nltk, sys, tkinter, numpy, pandas, bs4, PIL, seaborn,time,requests,random,sklearn,warnings,copy,wordcloud, selenium, string 
+
+
+Larded with many several sorts of reasons
+Importing Denmark's health and England's too,
+With, ho! such bugs and goblins in my life,
+That, on the supervise, no leisure bated,
+No, not to stay the grinding of the axe,
+My head should be struck off.
+

@@ -47,15 +47,16 @@ class YouTubeComments:
         scroll()
         ytHTML = BeautifulSoup(YouTubeComments.chromeDriver.page_source,"lxml")
 
-        wait = WebDriverWait(YouTubeComments.chromeDriver, 7)
+        wait = WebDriverWait(YouTubeComments.chromeDriver, 5)
         comments = []
-        for comment in wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, "#comment #content-text"))):
+        for comment in wait.until(EC.presence_of_all_elements_located(\
+                          (By.CSS_SELECTOR, "#comment #content-text"))):
             comments.append(comment.text)
         self.comments = comments
 
 def runCommentScrape(url="https://www.youtube.com/watch?v=OtRuEhm9Eoo"):
     try:
-        ytComments = YouTubeComments(url=url,bottom = 5000,increment = 350)
+        ytComments = YouTubeComments(url=url,bottom = 3000,increment = 350)
         ytComments.scrape()
         return ytComments.comments
     except Exception as e:
