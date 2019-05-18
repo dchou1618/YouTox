@@ -114,10 +114,10 @@ class YouToxSentiment:
                     currGroups[i].pop()
 
     # generates different groups of related-toxicity labels
-    def generateGroups(self,L):
+    def generateGroups(self,L,n):
         currGroups = [None]*6 # number of toxicity labels
         allItemGroups = []
-        return self.groupWrapper(currGroups,allItemGroups,L)
+        return self.groupWrapper(currGroups,allItemGroups,L,n)
 
 def analyzeSentiment(words):
     yt = YouToxSentiment(words)

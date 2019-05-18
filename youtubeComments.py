@@ -23,8 +23,7 @@ import matplotlib.pyplot as plt
 
 
 class YouTubeComments:
-    chromeDriver = webdriver.Chrome(r"./chromedriver.exe",
-                                    options = options)
+    chromeDriver = webdriver.Chrome(r"./chromedriver.exe", options = options)
     def __init__(self,**kwargs):
         for key in kwargs:
             val = kwargs[key]
@@ -47,7 +46,7 @@ class YouTubeComments:
         scroll()
         ytHTML = BeautifulSoup(YouTubeComments.chromeDriver.page_source,"lxml")
 
-        wait = WebDriverWait(YouTubeComments.chromeDriver, 5)
+        wait = WebDriverWait(YouTubeComments.chromeDriver, 7)
         comments = []
         for comment in wait.until(EC.presence_of_all_elements_located(\
                           (By.CSS_SELECTOR, "#comment #content-text"))):
@@ -56,8 +55,8 @@ class YouTubeComments:
 
 def runCommentScrape(url="https://www.youtube.com/watch?v=OtRuEhm9Eoo"):
     try:
-        ytComments = YouTubeComments(url=url,bottom = 3000,increment = 350)
+        ytComments = YouTubeComments(url=url,bottom = 5000,increment = 350)
         ytComments.scrape()
         return ytComments.comments
     except Exception as e:
-        return "Error"+str(e)
+        return "Error: "+str(e)

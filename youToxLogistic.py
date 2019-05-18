@@ -92,7 +92,9 @@ class YouToxLogistic:
         # turns png image into gif
         pngToGIF("toxicity.png")
 
-def run(val,trainModel=False):
+def run(val,trainModel=False,result=[]):
     yt = YouToxLogistic(data="./train.csv", val = val)
     if trainModel: yt.train()
-    yt.predictUsingModel()
+    probabilities = yt.predictUsingModel()
+    result = probabilities
+    
